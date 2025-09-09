@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./pizzaria.db"
+}
+
+model Cliente {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  telefone     String
+  endereco     String
+  taxaEntrega  Float
+  pedidos      Pedido[]
+}
+
+model Categoria {
+  id        Int         @id @default(autoincrement())
+  nome      String
+  itens     Item[]
+  promocoes Promocao[]
+}
+
+model Item {
+  id            Int            @id @default(autoincrement())
+  nome          String
+  preco         Float
+  categoriaId   Int
+  categoria     Categoria      @relation(fields: [categoriaId], references: [id])
+  sabores       ItemSabor[]
+  promocaoItens PromocaoItem[]
+  pedidoItens   PedidoItem[]
+  temSabor      Boolean        @default(false)
+}
+
+model Sabor {
+  id    Int      @id @default(autoincrement())
+  nome  String
+  itens ItemSabor[]
+}
+
+model ItemSabor {
+  id      Int   @id @default(autoincrement())
+  itemId  Int
+  saborId Int
+  item    Item   @relation(fields: [itemId], references: [id])
+  sabor   Sabor  @relation(fields: [saborId], references: [id])
+  @@unique([itemId, saborId])
+}
+
+model Promocao {
+  id          Int        @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  valor       Float      @default(0)
+  categoriaId Int?
+  categoria   Categoria? @relation(fields: [categoriaId], references: [id])
+  itens       PromocaoItem[]
+}
+
+model PromocaoItem {
+  id         Int      @id @default(autoincrement())
+  promocaoId Int
+  itemId     Int
+  quantidade Int      @default(1)
+  promocao   Promocao @relation(fields: [promocaoId], references: [id])
+  item       Item     @relation(fields: [itemId], references: [id])
+}
+
+model Pedido {
+  id         Int      @id @default(autoincrement())
+  clienteId  Int
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  data       DateTime @default(now())
+  total      Float
+  itens      PedidoItem[]
+}
+
+model PedidoItem {
+  id        Int    @id @default(autoincrement())
+  pedidoId  Int
+  itemId    Int
+  quantidade Int
+  pedido    Pedido @relation(fields: [pedidoId], references: [id])
+  item      Item   @relation(fields: [itemId], references: [id])
+}

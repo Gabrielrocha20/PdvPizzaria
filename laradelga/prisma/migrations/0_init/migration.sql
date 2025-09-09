@@ -1,0 +1,1 @@
+-- Baseline inicial, não altera nada no banco

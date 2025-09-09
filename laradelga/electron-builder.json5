@@ -1,0 +1,59 @@
+{
+  appId: "com.LaradelgaVendas.com",
+  productName: "Laragelga",
+  directories: {
+    output: "release/${version}",
+  },
+  asar: false,
+  files: [
+    "dist",
+    "dist-electron",
+    "prisma",
+    "controllers",
+    "node_modules/**/*",
+    "./node_modules/@prisma/client",
+    "./node_modules/.prisma/",
+    "./node_modules/react-custom-scrollbars-2",
+    "./node_modules/react-icons",
+    "./node_modules/recharts",
+    "package.json",
+    "tests",
+    "src",
+    ".env",
+  ],
+  extraResources: [
+    "node_modules/.prisma/**/*",
+    "node_modules/@prisma/client/**/*",
+    "./node_modules/react-custom-scrollbars-2",
+    "./node_modules/react-icons",
+    "./node_modules/recharts",
+    "prisma",
+  ],
+  mac: {
+    target: ["dmg"],
+    artifactName: "${productName}-Mac-${version}-Installer.${ext}",
+  },
+  win: {
+    icon: "icone.ico",
+    target: [
+      {
+        target: "nsis",
+        arch: ["x64"],
+      },
+    ],
+    artifactName: "${productName}-Windows-${version}-Setup.${ext}",
+  },
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    deleteAppDataOnUninstall: false,
+    installerIcon: "icone.ico",
+    uninstallerIcon: "icone.ico",
+    installerHeaderIcon: "icone.ico",
+  },
+  linux: {
+    target: ["AppImage"],
+    artifactName: "${productName}-Linux-${version}.${ext}",
+  },
+}
