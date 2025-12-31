@@ -1,10 +1,13 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const DEMO_MODE = process.env.DEMO_MODE === "true";
+
 // Criar promoção
 async function criaPromocao(formData) {
-  const { nome, descricao, valor, categoriaId } = formData;
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
 
+  const { nome, descricao, valor, categoriaId } = formData;
   if (!nome || valor === undefined) {
     throw new Error("Os campos 'nome' e 'valor' são obrigatórios.");
   }
@@ -20,9 +23,7 @@ async function criaPromocao(formData) {
       categoria: true,
       itens: {
         include: {
-          item: {
-            select: { id: true, nome: true, preco: true }
-          }
+          item: { select: { id: true, nome: true, preco: true } }
         }
       }
     },
@@ -34,6 +35,8 @@ async function criaPromocao(formData) {
 
 // Editar promoção
 async function editaPromocao(id, formData) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const { nome, descricao, valor, categoriaId } = formData;
 
   const promocaoEditada = await prisma.promocao.update({
@@ -48,9 +51,7 @@ async function editaPromocao(id, formData) {
       categoria: true,
       itens: {
         include: {
-          item: {
-            select: { id: true, nome: true, preco: true }
-          }
+          item: { select: { id: true, nome: true, preco: true } }
         }
       }
     },
@@ -62,15 +63,15 @@ async function editaPromocao(id, formData) {
 
 // Deletar promoção
 async function deletaPromocao(id) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const promocaoDeletada = await prisma.promocao.delete({
     where: { id: parseInt(id) },
     include: { 
       categoria: true,
       itens: {
         include: {
-          item: {
-            select: { id: true, nome: true, preco: true }
-          }
+          item: { select: { id: true, nome: true, preco: true } }
         }
       }
     },
@@ -87,9 +88,7 @@ async function getAllPromocoes() {
       categoria: true,
       itens: {
         include: {
-          item: {
-            select: { id: true, nome: true, preco: true, temSabor: true }
-          }
+          item: { select: { id: true, nome: true, preco: true, temSabor: true } }
         }
       }
     },
@@ -104,9 +103,7 @@ async function getPromocaoById(id) {
       categoria: true,
       itens: {
         include: {
-          item: {
-            select: { id: true, nome: true, preco: true, temSabor: true }
-          }
+          item: { select: { id: true, nome: true, preco: true, temSabor: true } }
         }
       }
     },

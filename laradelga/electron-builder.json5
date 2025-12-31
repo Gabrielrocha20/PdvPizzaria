@@ -1,6 +1,6 @@
 {
   appId: "com.LaradelgaVendas.com",
-  productName: "Laragelga",
+  productName: "Laradelga",
   directories: {
     output: "release/${version}",
   },
@@ -16,6 +16,7 @@
     "./node_modules/react-custom-scrollbars-2",
     "./node_modules/react-icons",
     "./node_modules/recharts",
+    "./node_modules/dotenv",
     "package.json",
     "tests",
     "src",
@@ -27,7 +28,9 @@
     "./node_modules/react-custom-scrollbars-2",
     "./node_modules/react-icons",
     "./node_modules/recharts",
+    "./node_modules/dotenv",
     "prisma",
+    ".env",
   ],
   mac: {
     target: ["dmg"],

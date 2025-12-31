@@ -3,7 +3,9 @@ const pkg = require('@prisma/client');
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
+
 async function criaPedido(clienteId, total, itens) {
+
   const pedido = await prisma.pedido.create({
     data: {
       clienteId,
@@ -22,10 +24,11 @@ async function criaPedido(clienteId, total, itens) {
   });
 
   console.log("✅ Pedido cadastrado com sucesso:", JSON.stringify(pedido, null, 2));
-
   return pedido;
 }
+
 async function editaPedido(id, formData) {
+
   return await prisma.pedido.update({
     where: { id },
     data: formData,
@@ -33,6 +36,7 @@ async function editaPedido(id, formData) {
 }
 
 async function deletaPedido(id) {
+
   return await prisma.pedido.delete({ where: { id } });
 }
 

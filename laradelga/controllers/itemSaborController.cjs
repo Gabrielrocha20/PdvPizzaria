@@ -3,13 +3,19 @@ const pkg = require('@prisma/client');
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
+const DEMO_MODE = process.env.DEMO_MODE === "true";
+
 async function criaItemSabor(itemId, saborId) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   return await prisma.itemSabor.create({
     data: { itemId, saborId },
   });
 }
 
 async function deletaItemSabor(id) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   return await prisma.itemSabor.delete({ where: { id } });
 }
 

@@ -2,8 +2,12 @@ const pkg = require('@prisma/client');
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
+const DEMO_MODE = process.env.DEMO_MODE === "true";
+
 // Criar produto
 async function criaProduto(formData) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const { nome, preco, categoriaId, temSabor } = formData;
 
   if (!nome || !preco || !categoriaId) {
@@ -25,6 +29,8 @@ async function criaProduto(formData) {
 
 // Editar produto
 async function editaProduto(id, formData) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const { nome, preco, categoriaId, temSabor } = formData;
 
   if (!id) throw new Error("ID do produto é obrigatório para edição.");
@@ -45,6 +51,8 @@ async function editaProduto(id, formData) {
 
 // Deletar produto
 async function deletaProduto(id) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   if (!id) throw new Error("ID do produto é obrigatório para exclusão.");
 
   const produtoDeletado = await prisma.item.delete({

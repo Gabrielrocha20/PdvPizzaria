@@ -2,8 +2,12 @@ const pkg = require('@prisma/client');
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
+const DEMO_MODE = process.env.DEMO_MODE === "true";
+
 // Criar cliente
 async function criaCliente(formData) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const { nome, telefone, endereco, taxaEntrega } = formData;
 
   if (!nome || !telefone) {
@@ -25,6 +29,8 @@ async function criaCliente(formData) {
 
 // Editar cliente
 async function editaCliente(id, formData) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const { nome, telefone, endereco, taxaEntrega } = formData;
 
   const clienteEditado = await prisma.cliente.update({
@@ -43,6 +49,8 @@ async function editaCliente(id, formData) {
 
 // Deletar cliente
 async function deletaCliente(id) {
+  if (DEMO_MODE) throw new Error("🚫 Função desativada no modo DEMO.");
+
   const clienteDeletado = await prisma.cliente.delete({
     where: { id: parseInt(id) },
   });

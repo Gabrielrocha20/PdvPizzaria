@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { FaUtensils, FaCashRegister, FaListAlt, FaFileAlt, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useImpressoraPadrao } from '../hook/useGetImpressoraHook'
-
+import { usePedidoHook } from "../hook/usePedido";
 
 export default function Home() {
   const [showCashModal, setShowCashModal] = useState(false);
   const navigate = useNavigate();
+  const { faturamento, loading } = usePedidoHook();
   const { impressora} = useImpressoraPadrao();
   
   // Simulação do faturamento do dia
@@ -92,7 +93,7 @@ export default function Home() {
               </button>
             </div>
             <div style={styles.modalBody}>
-              <p style={styles.revenueAmount}>R$ {dailyRevenue.toFixed(2)}</p>
+              <p style={styles.revenueAmount}>R$ {faturamento.toFixed(2)}</p>
             </div>
           </div>
         </div>

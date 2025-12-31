@@ -1,11 +1,17 @@
 const pkg = require('@prisma/client');
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
+require("dotenv").config();
+
+const DEMO_MODE = process.env.DEMO_MODE === "true";
 
 // Criar categoria
 async function criaCategoria(formData) {
-  const { nome } = formData;
+  if (DEMO_MODE) {
+    throw new Error("🚫 Função bloqueada na versão demo: não é possível criar categoria.");
+  }
 
+  const { nome } = formData;
   if (!nome) throw new Error("O campo 'nome' é obrigatório para criar categoria.");
 
   const novaCategoria = await prisma.categoria.create({
@@ -18,8 +24,11 @@ async function criaCategoria(formData) {
 
 // Editar categoria
 async function editaCategoria(id, formData) {
-  const { nome } = formData;
+  if (DEMO_MODE) {
+    throw new Error("🚫 Função bloqueada na versão demo: não é possível editar categoria.");
+  }
 
+  const { nome } = formData;
   if (!id) throw new Error("ID da categoria é obrigatório para edição.");
 
   const categoriaEditada = await prisma.categoria.update({
@@ -33,6 +42,10 @@ async function editaCategoria(id, formData) {
 
 // Deletar categoria
 async function deletaCategoria(id) {
+  if (DEMO_MODE) {
+    throw new Error("🚫 Função bloqueada na versão demo: não é possível excluir categoria.");
+  }
+
   if (!id) throw new Error("ID da categoria é obrigatório para exclusão.");
 
   const categoriaDeletada = await prisma.categoria.delete({

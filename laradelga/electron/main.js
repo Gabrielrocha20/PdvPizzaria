@@ -11,7 +11,7 @@ const { criaSabor, editaSabor, deletaSabor, getAllSabores, getSaborById } = requ
 const { criaPromocao, editaPromocao, deletaPromocao, getAllPromocoes, getPromocaoById } = require('../controllers/promocaoController.cjs');
 const { criaCliente, editaCliente, deletaCliente, getAllClientes, getClienteById, getPedidosCliente } = require('../controllers/clienteController.cjs');
 const { criaProduto, editaProduto, deletaProduto, getAllProdutos, getProdutoById } = require('../controllers/produtoController.cjs');
-const { imprimirEtiqueta, getImpressoraPadrao } = require('../controllers/printLabel.cjs');
+const { imprimirPedido, getImpressoraPadrao } = require('../controllers/printLabel.cjs');
 const { criaItemSabor, deletaItemSabor, getAllItemSabor } = require('../controllers/itemSaborController.cjs');
 const { criaPromocaoItem, deletaPromocaoItem, getAllPromocaoItem, editaPromocaoItem } = require('../controllers/promocaoItemController.cjs');
 
@@ -136,6 +136,7 @@ ipcMain.handle('get-impressora-padrao', async () => {
     return { sucesso: false, mensagem: erro instanceof Error ? erro.message : String(erro) };
   }
 });
+ipcMain.handle('imprime-pedido', (_, orderData) => imprimirPedido(orderData));
 
 app.whenReady().then(() => {
   createWindow();

@@ -284,14 +284,6 @@ export default function CadastroPromocao() {
                 <Scrollbars
                   style={{ height: "400px" }} // define a altura fixa para rolar
                   autoHide
-                  autoHideTimeout={1000}
-                  autoHideDuration={200}
-                  renderThumbVertical={({ style, ...props }) => (
-                    <div {...props} style={{ ...style, backgroundColor: "#00ffff", borderRadius: 4 }} />
-                  )}
-                  renderTrackVertical={({ style, ...props }) => (
-                    <div {...props} style={{ ...style, backgroundColor: "#16213e", borderRadius: 4 }} />
-                  )}
                 >
                   <div style={styles.modalBody}>
                     <div style={styles.form}>
@@ -409,14 +401,6 @@ export default function CadastroPromocao() {
              <Scrollbars
               style={{ height: "400px" }} // define a altura fixa para rolar
               autoHide
-              autoHideTimeout={1000}
-              autoHideDuration={200}
-              renderThumbVertical={({ style, ...props }) => (
-                <div {...props} style={{ ...style, backgroundColor: "#00ffff", borderRadius: 4 }} />
-              )}
-              renderTrackVertical={({ style, ...props }) => (
-                <div {...props} style={{ ...style, backgroundColor: "#16213e", borderRadius: 4 }} />
-              )}
             >
               <div style={styles.modalBody}>
                 {/* Campo de busca no modal de produtos */}

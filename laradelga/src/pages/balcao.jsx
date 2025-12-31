@@ -232,6 +232,7 @@ export default function Balcao() {
       }));
 
     await cria(clienteSelected.id, total, itensParaSalvar);
+    await window.ipcRenderer.invoke('imprime-pedido', orderData);
 
     console.log("Finalizando pedido:", orderData);
     alert("Pedido finalizado!");
@@ -256,7 +257,7 @@ export default function Balcao() {
             </div>
             Balcão - Sistema de Pedidos
           </h1>
-          <div style={styles.systemInfo}>v0.0.3 - Pizzaria</div>
+          <div style={styles.systemInfo}>v0.0.6 - Pizzaria</div>
         </div>
       </div>
 
@@ -303,14 +304,7 @@ export default function Balcao() {
             <Scrollbars
               style={styles.scrollContainer}
               autoHide
-              autoHideTimeout={1000}
-              autoHideDuration={200}
-              renderThumbVertical={({ style, ...props }) => (
-                <div {...props} style={{ ...style, ...styles.scrollThumb }} />
-              )}
-              renderTrackVertical={({ style, ...props }) => (
-                <div {...props} style={{ ...style, ...styles.scrollTrack }} />
-              )}
+              
             >
               <div style={styles.cartItems}>
                 {cart.length === 0 ? (

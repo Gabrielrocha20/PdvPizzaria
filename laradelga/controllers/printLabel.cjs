@@ -2,66 +2,75 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
 
-const imprimirEtiqueta = (texto, formData) => {
-  let conteudo = texto
-  console.log("FORM", formData)
-conteudo = conteudo.replaceAll(
-    '{{tipo}}', formData.produto
-  ).replaceAll(
-    '{{base}}', formData.base
-  ).replaceAll(
-    '{{adicao}}', formData.adicao
-  ).replaceAll(
-    "{{barcode}}", formData.barcode
-  ).replaceAll(
-    "{{olhoLR}}", formData.olhoLR
-  ).replaceAll(
-    "{{estilo}}", 'UNC'
-  ).replaceAll(
-    "{{diametro}}", formData.diametro
-  ).replaceAll(
-    "{{baseReal}}", formData.baseReal
-  ).replaceAll("{{radius}}", formData.curvaReal
-  ).replaceAll("{{usuarioId}}", formData.usuarioId
-  ).replaceAll("{{lot}}", formData.lot
-  ).replaceAll("{{opc}}", formData.opc)
-  if (formData.olhoLR === 'R') {
-    conteudo = conteudo.replace(
-      /\^LRY\^FO\d+,\d+\^GB0,32,18\^FS\^LRN/g,
-      ''
-    )
-    conteudo = conteudo.replaceAll("^LRN","" 
-    ).replaceAll("^LRY","" );
+async function imprimirPedido(pedido) {
+  const { cliente, itens, total } = pedido;
+
+  // Pega a impressora padrão
+  const getImpressora = await getImpressoraPadrao(); // retorna { nome: "POS-80", conectada: true }
+
+  // Cria o conteúdo do pedido como string
+  const linhas = [];
+
+  const lineSeparator = "-".repeat(48);
+
+  linhas.push(centerText("==== PEDIDO ===="));
+  linhas.push(centerText(lineSeparator));
+
+  linhas.push(leftText("Cliente:"));
+  linhas.push(leftText(cliente.nome));
+  linhas.push(leftText(`Telefone: ${cliente.telefone}`));
+  linhas.push(leftText(`Endereco: ${cliente.endereco}`));
+  linhas.push(leftText(lineSeparator));
+
+  itens.forEach(item => {
+    const nomeLimpo = item.nome.replace(/\s*\(.*?\)/g, "");
+    linhas.push(formatItem(nomeLimpo, item.preco));
+
+    if (item.sabores && item.sabores.length > 0) {
+      item.sabores.forEach(sabor => {
+        linhas.push(leftText(`  -> ${sabor.nome}`));
+      });
+    }
+  });
+
+  linhas.push(leftText(lineSeparator));
+  linhas.push(formatItem("TOTAL", total, true));
+  linhas.push(leftText(lineSeparator));
+  linhas.push(centerText("Obrigado pela preferência!"));
+  linhas.push("\n\n\n"); // espaço extra no final para cortar
+
+  // Salva em arquivo temporário
+  const arquivo = path.resolve(__dirname, "pedido.txt");
+  fs.writeFileSync(arquivo, linhas.join("\n"), "ascii");
+
+  // Envia para impressora compartilhada
+  const printerPath = `\\\\127.0.0.1\\${getImpressora.nome}`;
+  exec(`print /D:"${printerPath}" "${arquivo}"`, (err, stdout, stderr) => {
+    if (err) console.error("Erro ao imprimir:", err);
+    else console.log("Pedido enviado com sucesso para", printerPath);
+  });
+
+  // Funções auxiliares
+  function leftText(text) {
+    return text;
   }
-  console.log(conteudo)
 
-  const filePath = path.resolve('C:\\Temp\\etiqueta.txt');
-  fs.writeFileSync(filePath, conteudo, { encoding: 'ascii' });
-  exec('wmic printer where Default="TRUE" get Name', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Erro: ${error.message}`);
-      return;
-    }
-    if (stderr) {
-      console.error(`Stderr: ${stderr}`);
-      return;
-    }
-    const lines = stdout.trim().split('\n');
-    const printerName = lines[1]?.trim();
-    console.log("IMPRESS", printerName)
-    // ENVIA COMO RAW USANDO O PRINT DE WINDOWS
-    exec(`print /D:"\\\\localhost\\${printerName}" "${filePath}"`, (err, stdout, stderr) => {
-      if (err) {
-        console.error('Erro ao imprimir:', err);
-      } else {
-        console.log('Etiqueta enviada com sucesso');
-      }
-    });
-  })
-};
+  function centerText(text) {
+    const max = 48;
+    if (text.length >= max) return text;
+    const pad = Math.floor((max - text.length) / 2);
+    return " ".repeat(pad) + text;
+  }
 
-// imprimirEtiqueta();
-
+  function formatItem(nome, preco, bold = false) {
+    // nome à esquerda, preço à direita
+    const precoStr = `R$ ${preco.toFixed(2)}`;
+    const totalLen = 48;
+    const space = totalLen - nome.length - precoStr.length;
+    const linha = nome + " ".repeat(space > 0 ? space : 1) + precoStr;
+    return linha;
+  }
+}
 function getImpressoraPadrao() {
   return new Promise((resolve, reject) => {
     exec('wmic printer where Default="TRUE" get Name,WorkOffline,PrinterStatus', (error, stdout, stderr) => {
@@ -86,91 +95,5 @@ function getImpressoraPadrao() {
   });
 }
 
-
-const texto = `
-^XA
-
-^FX Top section with logo, name and address.
-^CFb,20
-^FO50,50^FDINI^FS
-^FO50,260^FDSOLAMAX^FS
-^FO230,260^FD3.25^FS
-^FO320,260^FD3.00^FS
-^LRY
-^FO420,260^FDL^FS
-^LRY^FO418,255^GB0,32,18^FS^LRN
-
-
-^CFa,10
-^FT450,285^A0N,40,15^FH\^FDUNC^FS
-^FT520,285^A0N,40,15^FH\^FD80^FS
-^CFb,20
-^FX Third section with bar code.
-^FO210,310^FD220^FS
-^CFb,10
-^FO200,340^FDTC:2.98 at1.53 Ri^FS
-^FO200,360^FDLOT:LOT12321^FS
-^CFA,30
-
-^FO360,310
-^GB198,10,10,B,0^FS
-^BY2,3,35
-^FO360,320^B2^FD5114445447^FS
-^CFb,20
-^FO50,425^FDSOLAMAX^FS
-^FO230,425^FD3.25^FS
-^FO320,425^FD3.00^FS
-^LRY
-^FO420,425^FDL^FS
-^LRY^FO418,420^GB0,32,18^FS^LRN
-^LRN
-^CFa,20
-^FT450,450^A0N,40,15^FH\^FDUNC^FS
-^FT520,450^A0N,40,15^FH\^FD80^FS
-^CFb,20
-^FX Third section with bar code.
-^FO210,465^FD220^FS
-^CFb,10
-^FO200,500^FDTC:2.98 at1.53 Ri^FS
-^FO200,520^FDRadius:177.9^FS
-^FO200,540^FDINDEX:1.498(ND)^FS
-^FO200,570^FDGMN:30000351184^FS
-^FO200,590^FDLGC:L2052^FS
-^FO200,610^FDLOT:LOT12321^FS
-^CFA,30
-
-^FO360,470
-^GB198,10,10,B,0^FS
-^BY2,3,35
-^FO360,480^B2^FD5114445447^FS
-
-^FO375,550
-^GB165,10,10,B,0^FS
-^BY2,3,35
-
-^FO375,560^B2^FD01011109^FS
-^CFb,10
-^FO400,630^FDMADE IN BRAZIL^FS
-^FO60,610^FD01^FS
-
-
-^XZ
-`
-const data = {
-  id: 35,
-  tipoBase: 'SOLAMAX',
-  nomeProduto: '_',
-  diametro: '80',
-  base: '3.25',
-  adicao: '3.00',
-  curvaReal: '177.9',
-  baseReal: '2.98',
-  opc: '1.77',
-  olhoLR: 'L(Esq.)',
-  codigoBarras: '5114445447',
-  usuarioId: '01',
-  lot: '12312'
-
-}
 // imprimirEtiqueta(texto, data)
-module.exports = { imprimirEtiqueta, getImpressoraPadrao };
+module.exports = { imprimirPedido, getImpressoraPadrao };
